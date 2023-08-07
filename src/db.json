@@ -1,0 +1,19 @@
+{
+  "todoList": [
+    {
+      "text": "сделать дз",
+      "complete": false,
+      "id": "kW9J35f"
+    },
+    {
+      "text": "купить часы",
+      "complete": false,
+      "id": "lZQc7_o"
+    },
+    {
+      "text": "111",
+      "complete": false,
+      "id": "2_FxMWN"
+    }
+  ]
+}
