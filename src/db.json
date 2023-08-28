@@ -1,19 +1,19 @@
 {
-  "todoList": [
+  "todos": [
     {
-      "text": "сделать дз",
-      "complete": false,
-      "id": "kW9J35f"
+      "title": "111",
+      "completed": false,
+      "id": 7
     },
     {
-      "text": "купить часы",
-      "complete": false,
-      "id": "lZQc7_o"
+      "id": 1,
+      "title": "Сделать ДЗ",
+      "completed": false
     },
     {
-      "text": "111",
-      "complete": false,
-      "id": "2_FxMWN"
+      "id": 2,
+      "title": "Покормить слона",
+      "completed": false
     }
   ]
 }

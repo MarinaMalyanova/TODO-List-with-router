@@ -1,294 +1,98 @@
+import { Todos, Todo, ControlPanel, NotFound } from './components';
+import { createTodo, readTodos, updateTodo, deleteTodo } from './api';
+import { addTodoInTodos, findTodo, setTodoInTodos, removeTodoInTodos } from './utils';
 import { useEffect, useState } from 'react';
+import { Route, Routes, Link, useParams } from 'react-router-dom';
 import styles from './app.module.css';
-import { Routes, Route, Link, useParams, useNavigate } from 'react-router-dom';
-
-const Todos = () => {
-	const [todos, setTodos] = useState([]);
-	const [isLoading, setIsLoading] = useState(false);
-	const [isCreating, setIsCreating] = useState(false);
-	const [value, setValue] = useState('');
-	const [isSorting, setIsSorting] = useState(false);
-	const [isSearch, setIsSearch] = useState(false);
-	const [isSorted, setIsSorted] = useState(false);
-
-	useEffect(() => {
-		setIsLoading(true);
-		fetch('http://localhost:3004/todoList')
-			.then((rawResponse) => rawResponse.json())
-			.then((loadedTodos) => {
-				setTodos(loadedTodos);
-			})
-			.finally(() => setIsLoading(false));
-	}, []);
-
-	// const onChange = ({ target }) => {
-	// 	setValue(target.value);
-	// 	const filter = todos.filter((todo) => todo.text.includes(target.value));
-	// 	setTodos(filter);
-	// };
-
-	// const onSubmit = (event) => {
-	// 	event.preventDefault();
-	// 	setValue('');
-	// 	console.log({ value });
-	// };
-
-	// const requestAddTask = async () => {
-	// 	let newTask = {};
-
-	// 	setIsCreating(true);
-	// 	const response = await fetch('http://localhost:3004/todoList', {
-	// 		method: 'POST',
-	// 		headers: { 'Content-Type': 'application/json; charset=utf-8' },
-	// 		body: JSON.stringify({
-	// 			text: value,
-	// 			complete: false,
-	// 		}),
-	// 	});
-	// 	const json = await response.json();
-	// 	console.log('Задача добавлена. Ответ сервера:', json);
-	// 	newTask = { text: json.text, id: json.id };
-	// 	console.log(newTask);
-
-	// 	fetch('http://localhost:3004/todoList')
-	// 		.then((rawResponce) => rawResponce.json())
-	// 		.then((data) => {
-	// 			setTodos(data);
-	// 			console.log('data', data);
-	// 		})
-	// 		.finally(() => {
-	// 			setIsSearch(false);
-	// 			setIsCreating(false);
-	// 		});
-	// 	console.log(todos);
-	// };
-	// const sortTasks = () => {
-	// 	setIsSorting(true);
-	// 	fetch('http://localhost:3004/todoList?_sort=text')
-	// 		.then((rawResponce) => rawResponce.json())
-	// 		.then((sortArray) => {
-	// 			console.log('Задачи отсортированы. Ответ сервера:', sortArray);
-	// 			setIsSorted(true);
-	// 			setTodos(sortArray);
-	// 		})
-	// 		.finally(() => {
-	// 			setIsSorting(false);
-	// 			setIsSearch(false);
-	// 		});
-	// };
-
-	return (
-		<div>
-			{isLoading ? (
-				<div className={styles.loader}></div>
-			) : (
-				todos.map(({ id, text }) => (
-					<div className={styles.list} key={id}>
-						<span className={styles.id}></span>{' '}
-						<Link to={`/todo/${id}`} className={styles.todo}>
-							<span>{text}</span>
-						</Link>
-					</div>
-				))
-			)}
-		</div>
-	);
-};
-
-const Todo = () => {
-	const [todos, setTodos] = useState([]);
-	const [isLoading, setIsLoading] = useState(false);
-	const [isUpdating, setIsUpdating] = useState(false);
-	const [isDeleting, setIsDeleting] = useState(false);
-	const [value, setValue] = useState('555');
-	const [isSearch, setIsSearch] = useState(false);
-	const params = useParams();
-	const navigate = useNavigate();
-
-	useEffect(() => {
-		setIsLoading(true);
-		console.log(params.id);
-		fetch(`http://localhost:3004/todoList/${params.id}`)
-			.then((rawResponse) => rawResponse.json())
-			.then((loadedTodos) => {
-				console.log(loadedTodos);
-				setTodos(loadedTodos);
-				console.log(todos);
-			})
-			.finally(() => setIsLoading(false));
-	}, []);
-
-	const requestUpdateTask = () => {
-		setIsUpdating(true);
-		fetch(`http://localhost:3004/todoList/${params.id}`, {
-			method: 'PUT',
-			headers: { 'Content-Type': 'application/json; charset=utf-8' },
-			body: JSON.stringify({
-				text: value,
-				complete: false,
-			}),
-		})
-			.then((rawResponce) => rawResponce.json())
-			.then((responce) => {
-				console.log('Задача обновлена. Ответ сервера:', responce);
-				setTodos(
-					Object.entries(todos).map((todo) => {
-						if (todo.id === params.id) {
-							todo.text = value;
-						}
-						return todo;
-					}),
-				);
-			})
-			.finally(() => {
-				setIsSearch(false);
-				setIsUpdating(false);
-			});
-	};
-	const requestDeleteTask = (event) => {
-		const id = event.target.id;
-		console.log(id);
-		setIsDeleting(true);
-		fetch(`http://localhost:3004/todoList/${id}`, {
-			method: 'DELETE',
-		})
-			.then((rawResponce) => rawResponce.json())
-			.then((responce) => {
-				console.log('Задача удалена. Ответ сервера:', responce);
-				setTodos(Object.entries(todos).filter((todo) => todo.id !== id));
-				navigate(-1);
-			})
-			.finally(() => {
-				setIsSearch(false);
-				setIsDeleting(false);
-			});
-	};
-	return (
-		<>
-			<h2>Редактирование задачи</h2>
-			<div className={styles.list} key={todos.id} id={todos.id}>
-				<button onClick={() => navigate(-1)}>Назад</button>
-				<a href="/" className={styles.todo}>
-					<span>{todos.text}</span>
-				</a>
-				<button id={todos.id} disabled={isUpdating} onClick={requestUpdateTask}>
-					Изменить
-				</button>
-				<button id={todos.id} disabled={isDeleting} onClick={requestDeleteTask}>
-					Удалить
-				</button>
-			</div>
-		</>
-	);
-};
+import { NEW_TODO_ID } from './constants';
 
 function App() {
 	const [todos, setTodos] = useState([]);
-	const [isLoading, setIsLoading] = useState(false);
-	const [isCreating, setIsCreating] = useState(false);
-	const [isUpdating, setIsUpdating] = useState(false);
-	const [isDeleting, setIsDeleting] = useState(false);
-	const [value, setValue] = useState('');
-	const [isSorting, setIsSorting] = useState(false);
-	const [isSearching, setIsSearching] = useState(false);
-	const [isSorted, setIsSorted] = useState(false);
-	const [isSearch, setIsSearch] = useState(false);
+	const [isLoading, setIsLoading] = useState(true);
+	const [searchPhrase, setSearchPhrase] = useState('');
+	const [isAlphabetSorting, setIsAlphabetSorting] = useState(false);
+	const params = useParams();
+	const todoParamsId = Number(params.id);
+
+	const onTodoAdd = () => {
+		setTodos(addTodoInTodos(todos));
+	};
+
+	const onTodoSave = (todoId) => {
+		const { title } = findTodo(todos, todoId) || {};
+		console.log(todoId);
+
+		if (params.todoId === NEW_TODO_ID) {
+			createTodo({ title, completed: false }).then((todo) => {
+				let updatedTodos = setTodoInTodos(todos, {
+					id: NEW_TODO_ID,
+					isEditing: false,
+				});
+				updatedTodos = removeTodoInTodos(updatedTodos, NEW_TODO_ID);
+				updatedTodos = addTodoInTodos(updatedTodos, todo);
+				setTodos(updatedTodos);
+			});
+		} else {
+			updateTodo({ id: todoId, title }).then(() => {
+				setTodos(setTodoInTodos(todos, { id: todoId, isEditing: false }));
+			});
+		}
+	};
+
+	const onTodoEdit = (id) => {
+		setTodos(setTodoInTodos(todos, { id, isEditing: true }));
+	};
+
+	const onTodoTitleChange = (id, newTitle) => {
+		setTodos(setTodoInTodos(todos, { id, title: newTitle }));
+	};
+
+	const onTodoComplitedChange = (id, newComplited) => {
+		updateTodo({ id, completed: newComplited }).then(() => {
+			setTodos(setTodoInTodos(todos, { id, completed: newComplited }));
+		});
+	};
+
+	// const onTodoRemove = (id) => {
+	// 	deleteTodo(params.id).then(() => {
+	// 		setTodos(removeTodoInTodos(todos, id));
+	// 	});
+	// };
 
 	useEffect(() => {
-		setIsLoading(true);
-		fetch('http://localhost:3004/todoList')
-			.then((rawResponse) => rawResponse.json())
-			.then((loadedTodos) => {
-				setTodos(loadedTodos);
-			})
+		readTodos(searchPhrase, isAlphabetSorting)
+			.then((loadedData) => setTodos(loadedData.reverse()))
 			.finally(() => setIsLoading(false));
-	}, []);
+	}, [searchPhrase, isAlphabetSorting]);
 
-	const onChange = ({ target }) => {
-		setValue(target.value);
-		console.log(todos);
-		const filter = todos.filter((todo) => todo.text.includes(target.value));
-		setTodos(filter);
-	};
-
-	const onSubmit = (event) => {
-		event.preventDefault();
-		setValue('');
-		console.log({ value });
-	};
-
-	const requestAddTask = async () => {
-		let newTask = {};
-
-		setIsCreating(true);
-		const response = await fetch('http://localhost:3004/todoList', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json; charset=utf-8' },
-			body: JSON.stringify({
-				text: value,
-				complete: false,
-			}),
-		});
-		const json = await response.json();
-		console.log('Задача добавлена. Ответ сервера:', json);
-		newTask = { text: json.text, id: json.id };
-		console.log(newTask);
-
-		// const copyTodos = [...todos];
-		// copyTodos.push(newTask);
-		// setTodos(copyTodos);
-
-		fetch('http://localhost:3004/todoList')
-			.then((rawResponce) => rawResponce.json())
-			.then((data) => {
-				// setTodos(data);
-				setTodos([...todos, newTask]);
-				console.log(todos);
-				console.log('data', data);
-			})
-			.finally(() => {
-				setIsSearch(false);
-				setIsCreating(false);
-			});
-	};
-	const sortTasks = () => {
-		setIsSorting(true);
-		fetch('http://localhost:3004/todoList?_sort=text')
-			.then((rawResponce) => rawResponce.json())
-			.then((sortArray) => {
-				console.log('Задачи отсортированы. Ответ сервера:', sortArray);
-				setIsSorted(true);
-				setTodos(sortArray);
-			})
-			.finally(() => {
-				setIsSorting(false);
-				setIsSearch(false);
-			});
-	};
 	return (
 		<div className={styles.app}>
-			<h1>TODO List</h1>
-			<form onSubmit={onSubmit} className={styles.todoForm}>
-				<input
-					type="text"
-					name="text"
-					value={value}
-					className={styles.todoInput}
-					placeholder="Введите задачу"
-					onChange={onChange}
-				></input>
-				<button disabled={isCreating} onClick={requestAddTask}>
-					Добавить задачу
-				</button>
-			</form>
-			<div className={styles.buttons}>
-				<button disabled={isSorting} onClick={sortTasks}>
-					Сортировать задачи по алфавиту
-				</button>
-			</div>
+			<ControlPanel
+				onTodoAdd={onTodoAdd}
+				onSearch={setSearchPhrase}
+				onSorting={setIsAlphabetSorting}
+			/>
+
 			<Routes>
-				<Route path="/" element={<Todos />} />
-				<Route path="/todo/:id" element={<Todo />} />
+				<Route path="/" element={<Todos todos={todos} isLoading={isLoading} />} />
+				<Route
+					path="/todo/:id"
+					element={
+						<Todo
+							todos={todos}
+							onEdit={() => onTodoEdit(todoParamsId)}
+							onTitleChange={(newTitle) =>
+								onTodoTitleChange(todoParamsId, newTitle)
+							}
+							onCompletedChange={(newComplited) =>
+								onTodoComplitedChange(todoParamsId, newComplited)
+							}
+							onSave={() => onTodoSave(todoParamsId)}
+							// onRemove={() => onTodoRemove(params.id)}
+						/>
+					}
+				/>
+				<Route path="*" element={<NotFound />} />
 			</Routes>
 		</div>
 	);

@@ -1,0 +1,13 @@
+.todos a {
+	text-decoration: none;
+	font-size: 18px;
+	color: grey;
+	border: 1px solid rgb(73, 74, 90);
+	border-radius: 10px;
+	width: 100%;
+	padding: 7px;
+	margin: 2px;
+}
+.todos {
+	display: flex;
+}

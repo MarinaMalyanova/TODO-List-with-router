@@ -1,0 +1,10 @@
+.controlPanel {
+	display: flex;
+	height: 45px;
+	justify-content: space-between;
+	margin: 10px 0 30px 0;
+}
+
+.addButton {
+	width: 50px;
+}
